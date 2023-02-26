@@ -1,0 +1,38 @@
+---
+- hosts: host
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Преднастройка postfix
+      tags: "init postfix"
+      ansible.builtin.debconf:
+        name: postfix
+        question: postfix/mailname
+        vtype: select
+        value: "your.hostname.com"
+      no_log: True
+
+    - name: Преднастройка postfix
+      tags: "init postfix"
+      ansible.builtin.debconf:
+        name: postfix
+        question: postfix/main_mailer_type
+        vtype: select
+        value: 'Internet Site'
+      no_log: True
+
+    - name: Установка postfix
+      tags: "init postfix"
+      apt:
+        pkg:
+          - postfix
+        state: latest
+        update_cache: true
+
+    - name: Удаление postfix
+      tags: "drop postfix"
+      apt:
+        pkg:
+          - postfix
+        state: absent
